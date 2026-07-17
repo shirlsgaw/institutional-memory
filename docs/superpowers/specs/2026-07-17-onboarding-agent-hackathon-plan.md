@@ -177,19 +177,63 @@ Her UI then renders our contradiction through copy **she already wrote**: *"Some
 
 ---
 
-## 4. Persona map — must be composed
+## 4. Persona map — exists as a database, and it is half empty
 
-The Build Spec requires *"Persona map — who to meet, by role and chapter"* in round 1, and success criterion 1 is *"swap the chapter and the people-to-meet list changes."* **No such page exists.** The spec waves this away — *"Chapter-level variation is confirmed… no need to validate that the dimension matters"* — but **confirming the dimension matters is not the artifact existing.** Criterion 1 is unmeetable until this is built.
+**Correction to an earlier claim in this plan:** I previously wrote *"the persona map does not exist."* **Wrong.** It exists as a **database**, not a page. `Team Members` (`collection://63e85552-5e89-4065-9148-c945e59a5f03`, 77 rows) carries exactly what the Build Spec's round 1 needs:
 
-Real sources to compose from:
+`Name` · **`Team`** (Engineering / **Forward-Deployed PM** / Operations / Design / Talent / Commercial / Special Projects / Chief of Staff) · **`Chapter`** (relation → Chapters DB) · `Home Office` (NYC/SF/Dubai/NC/Remote) · **`Skills & Experience`** (free text + tag line) · **`Client-Facing Bio`** · `LinkedIn` · `Github` · `Start Date` · `Languages spoken` · `Neighborhood`
+
+That is *"who to meet, by role and chapter"*, filterable on **both** axes. It lacks only **sequencing**, which the generation prompt supplies. **Criterion 1 is therefore satisfiable** — swap `Chapter`, the people list changes; it's a `WHERE` clause.
+
+### 4.1 ⚠️ Query gotcha — prefix matching silently over-matches
+
+The chapter pages were created in one batch and **share the ID prefix `388dd50dc1fc80…`**. Filtering `WHERE "Chapter" LIKE '%388dd50d%'` returns **~52 people across multiple chapters** — including Joshua Marker and Eva Morgenstein, who are **Chapter 1** leads. It looks plausible and is wrong.
+
+**Always match the full page ID:**
+
+```sql
+SELECT "Name", "Team", "Home Office", "Skills & Experience", "Client-Facing Bio"
+FROM "collection://63e85552-5e89-4065-9148-c945e59a5f03"
+WHERE "Chapter" LIKE '%388dd50dc1fc80b3b762d9a7fa6ccd5d%'
+ORDER BY "Team", "Name"
+```
+
+Returns **exactly 26** — matching Chapter 2's own `Member Count`. That reconciliation is the check that the filter is right.
+
+### 4.2 Chapter 2 composition (verified)
+
+**26 members: 24 Engineering, 2 Forward-Deployed PM** (Alexandra Spencer-Wong, Andy Day).
+
+**Leads:** Ben Greenberg (Eng Lead / fCTO, SF) · Alexandra Spencer-Wong (FDPM Lead, SF) · Slack `#chapter_2`.
+
+**Coverage — 50% of the directory is empty:**
+
+| Field | Populated |
+|---|---|
+| `Skills & Experience` | **13 / 26** |
+| `Client-Facing Bio` | **13 / 26** |
+
+**⚠️ `Ben Greenberg` — Chapter 2's Engineering Lead / fCTO — has neither a bio nor skills.** The single person a new Chapter 2 hire most needs to meet is a blank row. Same for `Gleb Frank`, `Roy Feague`, `Nick Allen`, `Marvin Wu`, `Brandon Yen`, `You Zhou`, `Roman Platonov`, `Abrey Mann`, `Ahmed Meguid`.
+
+**Consequence for generation:** a "People to meet" section built from this DB will render **half its entries with no description**. Either the prompt must degrade gracefully (name + role + office only) or the demo shows blanks next to the chapter lead. **Decide before the gate.** This is not a data-cleanup task for us — it is a real property of the corpus, and arguably worth naming in the readout: the directory the onboarding flow depends on is half unfilled, and nothing marks that either.
+
+**Only 2 FDPMs in Chapter 2**, so for an AFDPM/FDPM persona the same-function people-to-meet list is **Alexandra + Andy Day**. Thin but real, and both rows are fully populated.
+
+### 4.3 Sources
 
 | Source | ID |
 |---|---|
+| **Team Members DB** — the persona map | `collection://63e85552-5e89-4065-9148-c945e59a5f03` |
 | Chapters DB | `collection://96b22b98-eeca-4873-92ae-ba4b13127aed` |
 | Chapter 2 (leads, 26 members, 16 projects, `#chapter_2`) | `388dd50dc1fc80b3b762d9a7fa6ccd5d` |
-| Team Members DB | `collection://63e85552-5e89-4065-9148-c945e59a5f03` |
-| Team Skills Directory | `collection://376dd50d-c1fc-8107-a5d6-000b1090383f` |
+| Team Skills Directory — 5 rows, richer free-text | `collection://376dd50d-c1fc-8107-a5d6-000b1090383f` |
 | How We Organize Teams (Advisor vs Project/Tech Lead split; department heads Dan, Salma, Xerxes) | `38add50dc1fc8000a747dfb0e26351c0` |
+
+### 4.4 Resumes — not needed here, and not reachable by us
+
+Raw resume files live in a Google Drive *"onboarding folder"*, alongside **Mandy Tan's** resume→bio skill (she owns it). **Both the human's Drive connector and mine fail** — mine returns `"Request had insufficient authentication scopes."` Routes in: re-authorize Drive, ask **Mandy Tan** (FDPM, NYC), or `ops@fractional.ai`.
+
+**This is not a blocker for the hackathon.** The Build Spec puts *"Who's done similar projects — needs project history plus a similarity judgment"* explicitly **Out**. Resumes matter to the **parked** matcher (D4 in [`2026-07-17-pm-onboarding-design.md`](./2026-07-17-pm-onboarding-design.md)), not to this build. And `Skills & Experience` is structured, curated, and already in Notion — for matching it is likely **better** than raw resumes, subject to the 50% coverage gap above.
 
 **⚠️ Duplicate-effort risk — resolve before building.** The sibling hackathon project **[Know Your Chapter](https://app.notion.com/p/3a0dd50dc1fc8076b727dd2bfcb6f413)** (linked as a child of our own Build Spec as of 22:10 today) builds from *"the Meet the Team page, the Notion projects database, and Slack channels"* and yields *"a decent lightweight 'who works on what' lookup for the chapter."* **That is the persona map.** And `chapter.html` in Shirley's PR is titled *"Know Your Chapter"* — the same idea, already partly built.
 

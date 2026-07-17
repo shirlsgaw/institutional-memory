@@ -3,8 +3,20 @@
 **Date:** 2026-07-17
 **Author:** Yury Kamen
 **Sponsor:** Alexandra (`alexandra@fractional.ai`, `U09J0K96CSD`) — *agreement asserted by Yury, not independently verified; see R2/R7*
-**Status:** Design, pending sponsor ratification. Phases 3 and 5 blocked on open inputs (§4.2).
+**Status:** ⏸️ **PARKED** — real-ops track, not this weekend's build. See note below.
 **Scope:** Onboarding for one incoming **FDPM** (full level, not Associate).
+
+> ## ⏸️ Parked 2026-07-17
+>
+> This document specs the **real-ops FDPM onboarding program**. It is **not** the hackathon build. The [Build Spec — Onboarding Institutional Memory Agent](https://app.notion.com/p/3a0dd50dc1fc80358b41d6c72740566d) puts *"Advisor and HR/Ops configuration surfaces"* explicitly **out** of scope and is **pull-only**, so Phase 0 (writing corrections into Notion) is out of scope for the hackathon by definition. This spec is orthogonal to that work, not misaligned with it.
+>
+> **The active plan is [`2026-07-17-onboarding-agent-hackathon-plan.md`](./2026-07-17-onboarding-agent-hackathon-plan.md).**
+>
+> Kept because it remains valid for the real FDPM hire sponsored by Alexandra. Two facts have since been **confirmed** and should be folded in if this is ever unparked:
+> - **§10 Q3 is answered.** Alexandra is **Alexandra Spencer-Wong, Chapter 2 FDPM Lead** (verified in the Chapters DB and in Shirley's `chapter.html`). She has clear standing to sponsor PM onboarding. R2 is retired.
+> - **§9.2 is corroborated.** `middleware.js` in PR #9 states *"ode.com is the public website; Workspace email is still @fractional.ai as of 2026-07-17."*
+>
+> Still blocking if unparked: **D2** (hire name + start date) and **D4** (resume location).
 
 ---
 
